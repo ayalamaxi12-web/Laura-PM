@@ -1,0 +1,436 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Laura — Meta 23 SEP al 22 OCT</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#ECE7DC;
+    --paper-raised:#F5F2E9;
+    --ink:#1C1B17;
+    --ink-soft:#5B584C;
+    --line:#D2CBB8;
+    --teal:#2E6F5E;
+    --teal-soft:#DCE9E2;
+    --amber:#B9791E;
+    --amber-soft:#F1E3C9;
+    --brick:#9C4A3A;
+    --brick-soft:#EDDAD3;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper:#1B1A16;
+      --paper-raised:#242219;
+      --ink:#EDE9DD;
+      --ink-soft:#B4AF9E;
+      --line:#3A3728;
+      --teal:#6FBFA4;
+      --teal-soft:#233631;
+      --amber:#E0AC58;
+      --amber-soft:#3A2E17;
+      --brick:#D98D7B;
+      --brick-soft:#3A251F;
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:#1B1A16;
+    --paper-raised:#242219;
+    --ink:#EDE9DD;
+    --ink-soft:#B4AF9E;
+    --line:#3A3728;
+    --teal:#6FBFA4;
+    --teal-soft:#233631;
+    --amber:#E0AC58;
+    --amber-soft:#3A2E17;
+    --brick:#D98D7B;
+    --brick-soft:#3A251F;
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Space Grotesk', system-ui, sans-serif;
+    line-height:1.45;
+    padding:28px 18px 80px;
+  }
+  .wrap{max-width:1040px;margin:0 auto;}
+  .num{font-family:'IBM Plex Mono', monospace; font-variant-numeric: tabular-nums;}
+
+  header.top{
+    display:flex; flex-wrap:wrap; justify-content:space-between; align-items:flex-end;
+    gap:16px; border-bottom:2px solid var(--ink); padding-bottom:18px; margin-bottom:28px;
+  }
+  header.top h1{font-size:1.05rem; font-weight:600; margin:0 0 4px; letter-spacing:.01em;}
+  header.top .sub{color:var(--ink-soft); font-size:.88rem; margin:0;}
+  header.top .period{
+    font-family:'IBM Plex Mono', monospace; font-size:.82rem; color:var(--ink-soft);
+    text-align:right;
+  }
+
+  .hero{
+    display:grid; grid-template-columns: 1.3fr 1fr; gap:24px; margin-bottom:34px;
+  }
+  @media (max-width:720px){ .hero{grid-template-columns:1fr;} }
+  .hero-card{
+    background:var(--paper-raised); border:1px solid var(--line); border-radius:4px; padding:22px 24px;
+  }
+  .hero-card .label{font-size:.78rem; color:var(--ink-soft); margin:0 0 6px;}
+  .hero-card .big{font-size:2.5rem; font-weight:600; margin:0; line-height:1;}
+  .hero-card .foot{font-size:.82rem; color:var(--ink-soft); margin-top:10px;}
+
+  .progress-row{display:flex; align-items:center; gap:14px; margin-top:16px;}
+  .progress-track{flex:1; height:10px; background:var(--line); border-radius:6px; overflow:hidden;}
+  .progress-fill{height:100%; background:var(--teal); border-radius:6px; transition:width .3s ease;}
+  .progress-pct{font-family:'IBM Plex Mono',monospace; font-size:.85rem; min-width:48px; text-align:right;}
+
+  .stat-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background:var(--line); border:1px solid var(--line); border-radius:4px; overflow:hidden;}
+  .stat{background:var(--paper-raised); padding:14px 16px;}
+  .stat .k{font-size:.72rem; color:var(--ink-soft); margin:0 0 4px;}
+  .stat .v{font-size:1.15rem; font-weight:600; margin:0;}
+
+  section{margin-bottom:40px;}
+  h2{font-size:.95rem; font-weight:600; margin:0 0 4px; display:flex; align-items:baseline; gap:10px;}
+  h2 .count{font-family:'IBM Plex Mono',monospace; font-weight:400; font-size:.78rem; color:var(--ink-soft);}
+  p.lead{color:var(--ink-soft); font-size:.85rem; margin:0 0 16px; max-width:64ch;}
+
+  table{width:100%; border-collapse:collapse; font-size:.84rem;}
+  thead th{
+    text-align:left; font-weight:500; color:var(--ink-soft); font-size:.72rem;
+    border-bottom:1px solid var(--ink); padding:0 10px 8px; position:sticky; top:0; background:var(--paper);
+  }
+  tbody td{padding:7px 10px; border-bottom:1px solid var(--line); vertical-align:middle;}
+  tbody tr:hover{background:var(--paper-raised);}
+  td.num, th.num{text-align:right; font-family:'IBM Plex Mono',monospace;}
+
+  .table-scroll{max-height:520px; overflow:auto; border:1px solid var(--line); border-radius:4px;}
+  .table-scroll table{font-size:.82rem;}
+  .table-scroll thead th{background:var(--paper-raised);}
+
+  input.cell-input{
+    width:110px; border:1px solid var(--line); background:var(--paper); color:var(--ink);
+    font-family:'IBM Plex Mono',monospace; font-size:.82rem; padding:4px 6px; border-radius:3px; text-align:right;
+  }
+  input.cell-input:focus{outline:2px solid var(--teal); outline-offset:1px;}
+  input.note-input{
+    width:100%; min-width:160px; border:1px solid var(--line); background:var(--paper); color:var(--ink);
+    font-family:'Space Grotesk',sans-serif; font-size:.8rem; padding:4px 6px; border-radius:3px;
+  }
+  input.note-input::placeholder{color:var(--ink-soft); opacity:.7;}
+
+  .tag{display:inline-block; font-size:.68rem; padding:2px 7px; border-radius:20px; font-weight:600;}
+  .tag.ok{background:var(--teal-soft); color:var(--teal);}
+  .tag.watch{background:var(--amber-soft); color:var(--amber);}
+  .tag.behind{background:var(--brick-soft); color:var(--brick);}
+
+  .row-behind td.diff{color:var(--brick);}
+  .row-ahead td.diff{color:var(--teal);}
+
+  .today-marker{
+    display:inline-block; width:6px; height:6px; border-radius:50%; background:var(--amber); margin-right:6px;
+  }
+
+  .save-hint{font-size:.72rem; color:var(--ink-soft); margin-top:6px; min-height:1em;}
+  .toolbar{display:flex; justify-content:flex-end; margin-bottom:10px;}
+  button.reset{
+    font-family:'Space Grotesk',sans-serif; font-size:.76rem; background:none; border:1px solid var(--line);
+    color:var(--ink-soft); padding:5px 10px; border-radius:4px; cursor:pointer;
+  }
+  button.reset:hover{border-color:var(--brick); color:var(--brick);}
+
+  footer{border-top:1px solid var(--line); padding-top:16px; color:var(--ink-soft); font-size:.76rem;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <div>
+      <h1>Global Electronics Argentina — Laura</h1>
+      <p class="sub">Meta de facturación sobre stock activo (sin preventas)</p>
+    </div>
+    <div class="period">
+      PERÍODO<br/>
+      <strong id="periodLabel" style="color:var(--ink); font-size:1rem;">23 SEP – 22 OCT 2026</strong>
+    </div>
+  </header>
+
+  <div class="hero">
+    <div class="hero-card">
+      <p class="label">META DEL PERÍODO (30 DÍAS)</p>
+      <p class="big num" id="goalBig">$0</p>
+      <div class="progress-row">
+        <div class="progress-track"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+        <span class="progress-pct num" id="progressPct">0%</span>
+      </div>
+      <p class="foot" id="progressFoot">Acumulado $0 de $0 — faltan 30 días</p>
+    </div>
+    <div class="hero-card">
+      <p class="label">DE DÓNDE SALE ESTE NÚMERO</p>
+      <p style="font-size:.86rem; margin:0 0 10px;">Facturación real de Laura (PM, todos los canales de Ecom) del período actual en curso, 23/08 al 15/09: $34.133.237 en 24 días. Ese promedio diario, proyectado a 30 días, es la meta.</p>
+      <div class="stat-grid">
+        <div class="stat"><p class="k">Techo del stock actual</p><p class="v num" id="statTecho">$0</p></div>
+        <div class="stat"><p class="k">% del techo que pide la meta</p><p class="v num" id="statPct">0%</p></div>
+        <div class="stat"><p class="k">Meta diaria (real)</p><p class="v num" id="statDia">$0</p></div>
+      </div>
+    </div>
+  </div>
+
+  <section>
+    <h2>Plan de mañana <span class="count" id="planLabel"></span></h2>
+    <p class="lead">Reparte lo que falta vender mañana entre los SKUs que ya venden solo, según su peso real de ventas en 90 días. Se recalcula cada vez que cargás un día — si vas atrasado, las cuotas suben solas.</p>
+    <div class="table-scroll" style="max-height:360px;">
+      <table>
+        <thead>
+          <tr><th>SKU</th><th>Descripción</th><th class="num">Precio</th><th class="num">Unidades a vender</th><th class="num">Equivalente $</th></tr>
+        </thead>
+        <tbody id="planBody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <div class="toolbar">
+      <button class="reset" id="resetBtn">Reiniciar cargas del período</button>
+    </div>
+    <h2>Día a día <span class="count" id="daysCount"></span></h2>
+    <p class="lead">Cargá lo vendido el día anterior. El acumulado y el semáforo se actualizan solos. Esto es lo único que hay que tocar todos los días.</p>
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>Día</th><th>Fecha</th>
+            <th class="num">Meta día</th>
+            <th class="num">Vendido</th>
+            <th class="num">Acum. real</th>
+            <th class="num">Acum. meta</th>
+            <th class="num">Diferencia</th>
+            <th>Estado</th>
+          </tr>
+        </thead>
+        <tbody id="dailyBody"></tbody>
+      </table>
+    </div>
+    <p class="save-hint" id="saveHint">&nbsp;</p>
+  </section>
+
+  <section>
+    <h2>Ya vende solo <span class="count" id="bienCount"></span></h2>
+    <p class="lead">Facturó de verdad en el período 23/08–15/09. Acá no hay que pensar estrategia — es seguimiento: que no se corte el stock ni el precio se vaya de rango.</p>
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr><th>SKU</th><th>Descripción</th><th>Categoría</th><th class="num">Stock</th><th class="num">Precio</th><th class="num">Facturado en el período</th><th class="num">Potencial</th></tr>
+        </thead>
+        <tbody id="bienBody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <h2>Hay que buscarle la vuelta <span class="count" id="malCount"></span></h2>
+    <p class="lead">Tienen stock hoy pero facturaron $0 en el período 23/08–15/09. Es donde vive el margen de mejora sobre la meta — priorizá por potencial (columna de la derecha) y anotá la acción que se prueba con cada uno.</p>
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr><th>SKU</th><th>Descripción</th><th class="num">Stock</th><th class="num">Precio</th><th class="num">Facturado en el período</th><th class="num">Potencial</th><th>Acción a probar</th></tr>
+        </thead>
+        <tbody id="malBody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <footer>
+    Meta y segmentación basadas en facturación real de Laura (PM, columna AD), todos los canales Ecom, período 23/08–15/09/2026 (fuente: "Nuevo Reporte Facturacion" / pestaña "Agosto - Septiembre ECOM"). Stock y precios de "VENTAS POR CANALES LAURA 2.0" al 16/09/2026. Excluye SKUs de preventa (PV-) y SKUs sin stock actual. El "Plan de mañana" reparte lo que falta entre los SKUs de "ya vende solo" según su peso real de facturación. Cargado y editado acá — este tablero es el registro.
+  </footer>
+
+</div>
+
+<script id="app-data" type="application/json">{"goal": 42666540, "metaDia": 1422218, "dates": ["2026-09-23", "2026-09-24", "2026-09-25", "2026-09-26", "2026-09-27", "2026-09-28", "2026-09-29", "2026-09-30", "2026-10-01", "2026-10-02", "2026-10-03", "2026-10-04", "2026-10-05", "2026-10-06", "2026-10-07", "2026-10-08", "2026-10-09", "2026-10-10", "2026-10-11", "2026-10-12", "2026-10-13", "2026-10-14", "2026-10-15", "2026-10-16", "2026-10-17", "2026-10-18", "2026-10-19", "2026-10-20", "2026-10-21", "2026-10-22"], "bien": [{"sku": "SANDMAK3IN1", "desc": "Sandwichera Waflera Donera Eléctrica con 3 Placas Antiadhere", "cat": "Electrodomesticos", "subcat": "Pequeños Cocina", "stock": 716, "price": 39799, "real": 14414616}, {"sku": "VACSEALER-1688", "desc": "Selladora al Vacío para Rollo y Bolsas precortadas con porta", "cat": "Electrodomesticos", "subcat": "Pequeños Cocina", "stock": 478, "price": 167499, "real": 4175099}, {"sku": "JUICEREXTR1,2L", "desc": "Juguera Eléctrica de 1,2 Lts Acero Inoxidable - Global Elect", "cat": "Electrodomesticos", "subcat": "Pequeños Cocina", "stock": 30, "price": 44299, "real": 2418106}, {"sku": "SANDMAK1P", "desc": "Sandwichera Eléctrica con Placa Antiadherente 23x23 cm Luz I", "cat": "Electrodomesticos", "subcat": "Pequeños Cocina", "stock": 795, "price": 22769, "real": 2359277}, {"sku": "MONI-OFFICE-27IFHD", "desc": "Monitor Oficina de 27\" Negro Base V - Full HD 1920x1080@60HZ", "cat": "Audio y Video", "subcat": "TV y Video L", "stock": 73, "price": 193099, "real": 1239820}, {"sku": "TV-SMART-50IFHD", "desc": "Televisor Led Smart de 50\" Negro - Full HD 1920x1080@60HZ - ", "cat": "Audio y Video", "subcat": "TV y Video L", "stock": 1, "price": 508999, "real": 1088998}, {"sku": "FAN-COOL500-USB", "desc": "Ventilador con Agua Fría Humidificador Purificador USB - 3 V", "cat": "Electrodomesticos", "subcat": "Climatización", "stock": 692, "price": 17399, "real": 863165}, {"sku": "BLENDER1.5L", "desc": "Licuadora y Procesadora con 2 Jarras Plásticas de 1,5 Lts (1", "cat": "Electrodomesticos", "subcat": "Pequeños Cocina", "stock": 192, "price": 52219, "real": 821201}, {"sku": "MONI-OFFICE-21.5IFHD", "desc": "Monitor Oficina de 21.5\" Negro Base V - Full HD 1920x1080@60", "cat": "Audio y Video", "subcat": "TV y Video L", "stock": 98, "price": 123799, "real": 773433}, {"sku": "FAN-MIST-STAND-16I", "desc": "Ventilador con Rociador de Agua de Pie 16¨ - Tanque 4000ml A", "cat": "Electrodomesticos", "subcat": "Climatización", "stock": 145, "price": 174499, "real": 670845}, {"sku": "FAN-COOLSPRAY-USB", "desc": "Ventilador con Rociador de Agua Recargable USB con Luz Led 7", "cat": "Electrodomesticos", "subcat": "Climatización", "stock": 493, "price": 17199, "real": 646499}, {"sku": "OVENAIRFRYER18L", "desc": "Airfryer Horno 2 en 1 Capacidad 18 Lts 1400W - Global Electr", "cat": "Electrodomesticos", "subcat": "Pequeños Cocina", "stock": 3, "price": 143299, "real": 372823}, {"sku": "FAN-BLADELESSCOOL", "desc": "Ventilador Sin Aspas con Luz Led 7 Colores USB - 6 Velocidad", "cat": "Electrodomesticos", "subcat": "Climatización", "stock": 318, "price": 21999, "real": 358111}, {"sku": "FOODPROC2L", "desc": "Multiprocesadora Picadora Eléctrica con Jarra Plástica de 2 ", "cat": "Electrodomesticos", "subcat": "Pequeños Cocina", "stock": 23, "price": 30799, "real": 278755}, {"sku": "AFCRISPY-2P-D", "desc": "Airfryer Crispy con Display Color Programable y 2 potes 4+1.", "cat": "Electrodomesticos", "subcat": "Pequeños Cocina", "stock": 10, "price": 160899, "real": 211858}, {"sku": "FAN-3IN1-18I", "desc": "Ventilador 3 en 1 de Pie - Pared - Piso 18¨ - 3 Aspas Metal ", "cat": "Electrodomesticos", "subcat": "Climatización", "stock": 151, "price": 50299, "real": 143939}, {"sku": "FAN-ICEPORT", "desc": "Ventilador Portátil de Mano USB Recargable para Hielo o Agua", "cat": "Electrodomesticos", "subcat": "Climatización", "stock": 421, "price": 24999, "real": 120995}, {"sku": "SEALER-40", "desc": "Selladora y Cortadora de Bolsas con Regulador de Potencia - ", "cat": "Electrodomesticos", "subcat": "Pequeños Cocina", "stock": 1, "price": 43529, "real": 57724}, {"sku": "FAN-COOLSPRAY-RECH", "desc": "Ventilador Portátil con Rociador de Agua Fría Humidificador ", "cat": "Electrodomesticos", "subcat": "Climatización", "stock": 385, "price": 29999, "real": 36299}], "mal": [{"sku": "FAN-20I", "desc": "Ventilador de Piso 20¨ de 5 Aspas Metalicas - 3 Velocidades ", "cat": "Electrodomesticos", "subcat": "Climatización", "stock": 541, "price": 61099, "real": 0}, {"sku": "FAN-COOL300-USB", "desc": "Ventilador con Agua Fría Humidificador Purificador USB - 3 V", "cat": "Electrodomesticos", "subcat": "Climatización", "stock": 392, "price": 32199, "real": 0}, {"sku": "3010030077", "desc": "NO ESTA EN EL EXCEL", "cat": "Impresión 3D", "subcat": "Impresion 3D", "stock": 19, "price": 516509, "real": 0}, {"sku": "1020000267", "desc": "NO ESTA EN EL EXCEL", "cat": "Impresión 3D", "subcat": "Impresion 3D", "stock": 17, "price": 516509, "real": 0}, {"sku": "3010130056", "desc": "NO ESTA EN EL EXCEL", "cat": "Impresión 3D", "subcat": "Impresion 3D", "stock": 9, "price": 516509, "real": 0}, {"sku": "GL-2150", "desc": "Art para la Casa- Global Electronics (Caja x 1)", "cat": "Audio y Video", "subcat": "TV y Video L", "stock": 26, "price": 123799, "real": 0}, {"sku": "1020000346", "desc": "NO ESTA EN EL EXCEL", "cat": "Impresión 3D", "subcat": "Impresion 3D", "stock": 5, "price": 516509, "real": 0}, {"sku": "3040020189", "desc": "NO ESTA EN EL EXCEL", "cat": "Impresión 3D", "subcat": "Impresion 3D", "stock": 22, "price": 75359, "real": 0}, {"sku": "MONI-OFFICE-23.6IFHD", "desc": "Monitor Oficina de 23.6 Pulgadas Negro Base V - Full HD 1920", "cat": "Audio y Video", "subcat": "TV y Video L", "stock": 10, "price": 159499, "real": 0}, {"sku": "3020030023", "desc": "NO ESTA EN EL EXCEL", "cat": "Impresión 3D", "subcat": "Impresion 3D", "stock": 48, "price": 29859, "real": 0}, {"sku": "1040000006", "desc": "NO ESTA EN EL EXCEL", "cat": "Impresión 3D", "subcat": "Impresion 3D", "stock": 5, "price": 257009, "real": 0}, {"sku": "3010010047", "desc": "NO ESTA EN EL EXCEL", "cat": "Impresión 3D", "subcat": "Impresion 3D", "stock": 157, "price": 6759, "real": 0}, {"sku": "6990000312", "desc": "NO ESTA EN EL EXCEL", "cat": "Impresión 3D", "subcat": "Impresion 3D", "stock": 80, "price": 11259, "real": 0}, {"sku": "3040020190", "desc": "NO ESTA EN EL EXCEL", "cat": "Impresión 3D", "subcat": "Impresion 3D", "stock": 78, "price": 11259, "real": 0}, {"sku": "3010070007", "desc": "NO ESTA EN EL EXCEL", "cat": "Impresión 3D", "subcat": "Impresion 3D", "stock": 98, "price": 8859, "real": 0}, {"sku": "6990000313", "desc": "NO ESTA EN EL EXCEL", "cat": "Impresión 3D", "subcat": "Impresion 3D", "stock": 71, "price": 11259, "real": 0}, {"sku": "3030150019", "desc": "NO ESTA EN EL EXCEL", "cat": "Impresión 3D", "subcat": "Impresion 3D", "stock": 7, "price": 105499, "real": 0}, {"sku": "3020060149", "desc": "NO ESTA EN EL EXCEL", "cat": "Impresión 3D", "subcat": "Impresion 3D", "stock": 63, "price": 11259, "real": 0}, {"sku": "VACBAGS50-25X30", "desc": "Bolsas para Selladora al vacío precortadas de 25x30cm en paq", "cat": "Electrodomesticos", "subcat": "Pequeños Cocina", "stock": 35, "price": 19599, "real": 0}, {"sku": "3010100003", "desc": "NO ESTA EN EL EXCEL", "cat": "Impresión 3D", "subcat": "Impresion 3D", "stock": 60, "price": 11259, "real": 0}, {"sku": "GL-2700", "desc": "Art para la Casa  - Global Electronics (Caja x 1)", "cat": "Audio y Video", "subcat": "TV y Video L", "stock": 3, "price": 193099, "real": 0}, {"sku": "3010150058", "desc": "NO ESTA EN EL EXCEL", "cat": "Impresión 3D", "subcat": "Impresion 3D", "stock": 80, "price": 6759, "real": 0}, {"sku": "3010060077", "desc": "NO ESTA EN EL EXCEL", "cat": "Impresión 3D", "subcat": "Impresion 3D", "stock": 78, "price": 6759, "real": 0}, {"sku": "3020040129", "desc": "NO ESTA EN EL EXCEL", "cat": "Impresión 3D", "subcat": "Impresion 3D", "stock": 46, "price": 10359, "real": 0}, {"sku": "3010100004", "desc": "NO ESTA EN EL EXCEL", "cat": "Impresión 3D", "subcat": "Impresion 3D", "stock": 62, "price": 6759, "real": 0}, {"sku": "3020040128", "desc": "NO ESTA EN EL EXCEL", "cat": "Impresión 3D", "subcat": "Impresion 3D", "stock": 40, "price": 10359, "real": 0}, {"sku": "SEALER-20", "desc": "Selladora y Cortadora de Bolsas con Regulador de Potencia - ", "cat": "Electrodomesticos", "subcat": "Pequeños Cocina", "stock": 10, "price": 30799, "real": 0}, {"sku": "3030020205", "desc": "NO ESTA EN EL EXCEL", "cat": "Impresión 3D", "subcat": "Impresion 3D", "stock": 57, "price": 5259, "real": 0}, {"sku": "1020000172", "desc": "NO ESTA EN EL EXCEL", "cat": "Impresión 3D", "subcat": "Impresion 3D", "stock": 15, "price": 17859, "real": 0}, {"sku": "3020030042", "desc": "NO ESTA EN EL EXCEL", "cat": "Impresión 3D", "subcat": "Impresion 3D", "stock": 23, "price": 11259, "real": 0}, {"sku": "3010050224", "desc": "NO ESTA EN EL EXCEL", "cat": "Impresión 3D", "subcat": "Impresion 3D", "stock": 20, "price": 11259, "real": 0}, {"sku": "3020060148", "desc": "NO ESTA EN EL EXCEL", "cat": "Impresión 3D", "subcat": "Impresion 3D", "stock": 20, "price": 11259, "real": 0}, {"sku": "1030000036", "desc": "NO ESTA EN EL EXCEL", "cat": "Impresión 3D", "subcat": "Impresion 3D", "stock": 12, "price": 11259, "real": 0}, {"sku": "3010070069", "desc": "NO ESTA EN EL EXCEL", "cat": "Impresión 3D", "subcat": "Impresion 3D", "stock": 10, "price": 11259, "real": 0}, {"sku": "3020020081", "desc": "NO ESTA EN EL EXCEL", "cat": "Impresión 3D", "subcat": "Impresion 3D", "stock": 10, "price": 10359, "real": 0}, {"sku": "3040020194", "desc": "NO ESTA EN EL EXCEL", "cat": "Impresión 3D", "subcat": "Impresion 3D", "stock": 5, "price": 17859, "real": 0}, {"sku": "3010170457", "desc": "NO ESTA EN EL EXCEL", "cat": "Impresión 3D", "subcat": "Impresion 3D", "stock": 3, "price": 23999, "real": 0}, {"sku": "3010090095", "desc": "NO ESTA EN EL EXCEL", "cat": "Impresión 3D", "subcat": "Impresion 3D", "stock": 9, "price": 6759, "real": 0}, {"sku": "1020000231", "desc": "NO ESTA EN EL EXCEL", "cat": "Impresión 3D", "subcat": "Impresion 3D", "stock": 5, "price": 11259, "real": 0}, {"sku": "3010070196", "desc": "NO ESTA EN EL EXCEL", "cat": "Impresión 3D", "subcat": "Impresion 3D", "stock": 8, "price": 6759, "real": 0}, {"sku": "3010170323", "desc": "NO ESTA EN EL EXCEL", "cat": "Impresión 3D", "subcat": "Impresion 3D", "stock": 4, "price": 6759, "real": 0}, {"sku": "3010170485", "desc": "NO ESTA EN EL EXCEL", "cat": "Impresión 3D", "subcat": "Impresion 3D", "stock": 4, "price": 6759, "real": 0}, {"sku": "3010170456", "desc": "NO ESTA EN EL EXCEL", "cat": "Impresión 3D", "subcat": "Impresion 3D", "stock": 1, "price": 6759, "real": 0}, {"sku": "FAN-IND-79I", "desc": "Ventilador Industrial de Piso 79¨ con Base Móvil de 4 Ruedas", "cat": "Electrodomesticos", "subcat": "Climatización", "stock": 16, "price": 9, "real": 0}], "potencialTotal": 343327681, "potencialBien": 250031895, "potencialMal": 93295786}</script>
+<script id="app-state" type="application/json">{"actual": {}, "notes": {}}</script>
+<script>
+(function(){
+  const DATA = JSON.parse(document.getElementById('app-data').textContent);
+  const LS_KEY = 'laura_tracker_sep23_oct22_2026';
+  let STATE = JSON.parse(document.getElementById('app-state').textContent);
+  try {
+    const saved = localStorage.getItem(LS_KEY);
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      if (parsed && parsed.actual) STATE = parsed;
+    }
+  } catch (e) {}
+
+  let artifactApi = null;
+  if (window.claude && typeof window.claude.use === 'function') {
+    window.claude.use('artifact').then(a => { artifactApi = a; }).catch(()=>{});
+  }
+
+  function fmt(n){
+    n = Math.round(n||0);
+    return '$' + n.toLocaleString('es-AR');
+  }
+  function fmtDate(iso){
+    const parts = iso.split('-');
+    const d = parts[2], m = parts[1];
+    const meses = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+    return d + ' ' + meses[parseInt(m,10)-1];
+  }
+
+  function persist(){
+    document.getElementById('app-state').textContent = JSON.stringify(STATE);
+    const hint = document.getElementById('saveHint');
+    try {
+      localStorage.setItem(LS_KEY, JSON.stringify(STATE));
+      hint.textContent = 'Guardado en este navegador.';
+      setTimeout(()=>{ if(hint.textContent==='Guardado en este navegador.') hint.textContent='\u00A0'; }, 2000);
+    } catch (e) {
+      hint.textContent = 'No se pudo guardar localmente en este navegador.';
+    }
+    if (artifactApi && artifactApi.publish){
+      const fullHtml = '<!doctype html>\n' + document.documentElement.outerHTML;
+      artifactApi.publish(fullHtml).catch(()=>{});
+    }
+  }
+
+  function render(){
+    const goal = DATA.goal;
+    const metaDia = DATA.metaDia;
+    document.getElementById('goalBig').textContent = fmt(goal);
+    document.getElementById('statTecho').textContent = fmt(DATA.potencialTotal);
+    document.getElementById('statPct').textContent = Math.round(100*goal/DATA.potencialTotal) + '%';
+    document.getElementById('statDia').textContent = fmt(metaDia);
+    document.getElementById('daysCount').textContent = '· ' + DATA.dates.length + ' días';
+    document.getElementById('bienCount').textContent = '· ' + DATA.bien.length + ' SKUs · potencial ' + fmt(DATA.potencialBien);
+    document.getElementById('malCount').textContent = '· ' + DATA.mal.length + ' SKUs · potencial ' + fmt(DATA.potencialMal);
+
+    const body = document.getElementById('dailyBody');
+    body.innerHTML = '';
+    let cumActual = 0, cumMeta = 0;
+    const todayIso = new Date().toISOString().slice(0,10);
+    DATA.dates.forEach((iso, idx) => {
+      cumMeta += metaDia;
+      const val = STATE.actual[iso];
+      const hasVal = (val !== undefined && val !== null && val !== '');
+      if (hasVal) cumActual += Number(val);
+      const diff = hasVal ? (cumActual - cumMeta) : null;
+
+      const tr = document.createElement('tr');
+      let statusTag = '<span class="tag watch">pendiente</span>';
+      if (hasVal){
+        if (diff >= 0) { statusTag = '<span class="tag ok">en línea</span>'; tr.classList.add('row-ahead'); }
+        else if (diff > -metaDia) { statusTag = '<span class="tag watch">atrasado</span>'; tr.classList.add('row-behind'); }
+        else { statusTag = '<span class="tag behind">crítico</span>'; tr.classList.add('row-behind'); }
+      }
+      const isToday = iso === todayIso;
+      tr.innerHTML =
+        '<td>' + (isToday ? '<span class="today-marker"></span>' : '') + (idx+1) + '</td>' +
+        '<td>' + fmtDate(iso) + '</td>' +
+        '<td class="num">' + fmt(metaDia) + '</td>' +
+        '<td class="num"><input class="cell-input" type="number" min="0" step="1" data-date="' + iso + '" value="' + (hasVal ? Math.round(val) : '') + '" placeholder="—" /></td>' +
+        '<td class="num">' + fmt(cumActual) + '</td>' +
+        '<td class="num">' + fmt(cumMeta) + '</td>' +
+        '<td class="num diff">' + (hasVal ? ((diff>=0?'+':'') + fmt(diff)) : '—') + '</td>' +
+        '<td>' + statusTag + '</td>';
+      body.appendChild(tr);
+    });
+
+    // Plan de mañana: reparte lo que falta entre los SKUs que ya venden, por peso de v90
+    const nextIdx = DATA.dates.findIndex(function(iso){ return STATE.actual[iso] === undefined; });
+    const planLabel = document.getElementById('planLabel');
+    const planBody = document.getElementById('planBody');
+    if (nextIdx === -1) {
+      planLabel.textContent = '· período completo';
+      planBody.innerHTML = '<tr><td colspan="5" style="color:var(--ink-soft);">Ya cargaste los ' + DATA.dates.length + ' días del período.</td></tr>';
+    } else {
+      const remainingDays = DATA.dates.length - nextIdx;
+      const remainingGoal = goal - cumActual;
+      planLabel.textContent = '· para ' + fmtDate(DATA.dates[nextIdx]);
+      if (remainingGoal <= 0) {
+        planBody.innerHTML = '<tr><td colspan="5" style="color:var(--teal); font-weight:600;">Meta del período ya alcanzada — de acá en más es todo a favor.</td></tr>';
+      } else {
+        const neededTomorrow = remainingGoal / remainingDays;
+        const sumReal = DATA.bien.reduce(function(a,i){ return a + Math.max(i.real,0); }, 0);
+        const rows = DATA.bien
+          .filter(function(i){ return i.real > 0; })
+          .map(function(i){
+            const share = Math.max(i.real,0) / sumReal;
+            const montoAsignado = neededTomorrow * share;
+            const unidades = Math.max(1, Math.round(montoAsignado / i.price));
+            return { i: i, unidades: unidades, monto: unidades * i.price };
+          })
+          .sort(function(a,b){ return b.monto - a.monto; });
+        planBody.innerHTML = rows.map(function(r){
+          return '<tr><td>' + r.i.sku + '</td><td>' + r.i.desc + '</td>' +
+            '<td class="num">' + fmt(r.i.price) + '</td>' +
+            '<td class="num" style="font-weight:600;">' + r.unidades + '</td>' +
+            '<td class="num">' + fmt(r.monto) + '</td></tr>';
+        }).join('');
+      }
+    }
+
+    const pct = goal>0 ? Math.min(100, Math.round(100*cumActual/goal)) : 0;
+    document.getElementById('progressFill').style.width = pct + '%';
+    document.getElementById('progressPct').textContent = pct + '%';
+    const daysLoaded = Object.keys(STATE.actual).length;
+    document.getElementById('progressFoot').textContent =
+      'Acumulado ' + fmt(cumActual) + ' de ' + fmt(goal) + ' — ' + daysLoaded + ' de ' + DATA.dates.length + ' días cargados';
+
+    const bienBody = document.getElementById('bienBody');
+    bienBody.innerHTML = DATA.bien.map(function(i){
+      return '<tr><td>' + i.sku + '</td><td>' + i.desc + '</td><td>' + (i.subcat||i.cat) + '</td>' +
+        '<td class="num">' + i.stock.toLocaleString('es-AR') + '</td>' +
+        '<td class="num">' + fmt(i.price) + '</td>' +
+        '<td class="num">' + fmt(i.real) + '</td>' +
+        '<td class="num">' + fmt(i.stock*i.price) + '</td></tr>';
+    }).join('');
+
+    const malBody = document.getElementById('malBody');
+    malBody.innerHTML = DATA.mal.map(function(i){
+      const noteVal = (STATE.notes[i.sku]||'').replace(/"/g,'&quot;');
+      return '<tr><td>' + i.sku + '</td><td>' + i.desc + '</td>' +
+        '<td class="num">' + i.stock.toLocaleString('es-AR') + '</td>' +
+        '<td class="num">' + fmt(i.price) + '</td>' +
+        '<td class="num">$0</td>' +
+        '<td class="num">' + fmt(i.stock*i.price) + '</td>' +
+        '<td><input class="note-input" data-sku="' + i.sku + '" placeholder="ej: bajar 10% + destacar en ML" value="' + noteVal + '" /></td></tr>';
+    }).join('');
+
+    body.querySelectorAll('input.cell-input').forEach(function(inp){
+      inp.addEventListener('change', function(e){
+        const d = e.target.dataset.date;
+        const v = e.target.value;
+        if (v === '') delete STATE.actual[d];
+        else STATE.actual[d] = Number(v);
+        render();
+        persist();
+      });
+    });
+    malBody.querySelectorAll('input.note-input').forEach(function(inp){
+      inp.addEventListener('change', function(e){
+        const sku = e.target.dataset.sku;
+        STATE.notes[sku] = e.target.value;
+        render();
+        persist();
+      });
+    });
+  }
+
+  document.getElementById('resetBtn').addEventListener('click', function(){
+    if (!confirm('Esto borra todas las cargas diarias y notas del período. ¿Seguir?')) return;
+    STATE = { actual: {}, notes: {} };
+    render();
+    persist();
+  });
+
+  render();
+})();
+</script>
+
+</body>
+</html>
