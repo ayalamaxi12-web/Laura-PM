@@ -537,6 +537,9 @@
       const iStock = colIndex(stockHeaders, 'Stock Total');
       const iPrecio = colIndex(stockHeaders, 'PRECIOS ECOM');
       const iPM = colIndex(stockHeaders, 'PM');
+      if (iSku===-1 || iPM===-1 || iStock===-1 || iPrecio===-1){
+        throw new Error('No encontré las columnas esperadas en la pestaña "' + SHEETS.stock.tab + '" del Sheet de stock. Revisá que esté compartida como "cualquiera con el link puede ver" y que el nombre de pestaña sea exactamente ese (encontré ' + (stockHeaders? stockHeaders.length : 0) + ' columnas: ' + (stockHeaders? stockHeaders.slice(0,6).join(' | ') : 'ninguna') + '…)');
+      }
 
       const established = {};
       for (let r=2; r<stockRows.length; r++){
@@ -568,6 +571,9 @@
       const jPM = colIndex(factHeaders, 'PM');
       const jFact = colIndex(factHeaders, 'Facturacion +IVA');
       const jFecha = colIndex(factHeaders, 'FechaCreaciónVenta');
+      if (jSku===-1 || jPM===-1 || jFact===-1){
+        throw new Error('No encontré las columnas esperadas en la pestaña "' + SHEETS.facturacion.tab + '" del Sheet de facturación. Revisá que esté compartida como "cualquiera con el link puede ver" y el nombre exacto de la pestaña.');
+      }
 
       let totalReal = 0, minFecha = null, maxFecha = null;
       for (let r=1; r<factRows.length; r++){
@@ -622,10 +628,11 @@
       try { cached = JSON.parse(localStorage.getItem(CACHE_KEY)); } catch(e){}
       if (cached && cached.data){
         DATA = cached.data;
-        status.textContent = 'No se pudo conectar con Sheets (¿están compartidas "cualquiera con el link"?). Mostrando última sincronización: ' + new Date(cached.ts).toLocaleString('es-AR');
+        status.textContent = (err && err.message ? err.message : 'No se pudo conectar con Sheets.') +
+          ' — Mostrando última sincronización buena: ' + new Date(cached.ts).toLocaleString('es-AR');
         render();
       } else {
-        status.textContent = 'No se pudo conectar con Sheets y no hay datos guardados. Revisá que las dos planillas estén compartidas como "cualquiera con el link puede ver".';
+        status.textContent = (err && err.message ? err.message : 'No se pudo conectar con Sheets y no hay datos guardados.');
       }
       console.error(err);
     }
