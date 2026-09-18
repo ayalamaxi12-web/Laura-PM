@@ -144,6 +144,14 @@
   button.reset:hover{border-color:var(--brick); color:var(--brick);}
 
   footer{border-top:1px solid var(--line); padding-top:16px; color:var(--ink-soft); font-size:.76rem;}
+
+  .sync-bar{
+    display:flex; align-items:center; gap:10px; font-size:.78rem; color:var(--ink-soft);
+    background:var(--paper-raised); border:1px solid var(--line); border-radius:4px;
+    padding:8px 14px; margin-bottom:22px;
+  }
+  .sync-bar.err{color:var(--brick);}
+  .sync-bar.ok{color:var(--teal);}
 </style>
 </head>
 <body>
@@ -159,6 +167,11 @@
       <strong id="periodLabel" style="color:var(--ink); font-size:1rem;">23 SEP – 22 OCT 2026</strong>
     </div>
   </header>
+
+  <div class="sync-bar" id="syncBar">
+    <span id="syncStatus">Conectando con Google Sheets…</span>
+    <button class="reset" id="syncBtn" style="margin-left:auto;">Actualizar ahora</button>
+  </div>
 
   <div class="hero">
     <div class="hero-card">
@@ -255,7 +268,7 @@
 <script id="app-state" type="application/json">{"actual": {}, "notes": {}}</script>
 <script>
 (function(){
-  const DATA = JSON.parse(document.getElementById('app-data').textContent);
+  let DATA = JSON.parse(document.getElementById('app-data').textContent);
   const LS_KEY = 'laura_tracker_sep23_oct22_2026';
   let STATE = JSON.parse(document.getElementById('app-state').textContent);
   try {
@@ -428,7 +441,200 @@
     persist();
   });
 
+  // ===== Sincronización en vivo con Google Sheets =====
+  // Configurá acá los IDs y nombres de pestaña si cambian de un período a otro.
+  const SHEETS = {
+    facturacion: {
+      id: '1CqUTqbDMwRL4SCyh9qkgh5xhQrnxfJR_eQbNEAMnksc',
+      tab: 'Agosto - Septiembre ECOM'
+    },
+    stock: {
+      id: '1Xf0YaqOjyEH1Yt8Ec4LNVS1w8HAdoPMZAcEGVMwyQuU',
+      tab: 'Laura'
+    }
+  };
+  const CACHE_KEY = 'laura_tracker_sheet_cache_v1';
+
+  function gvizUrl(sheet){
+    return 'https://docs.google.com/spreadsheets/d/' + sheet.id + '/gviz/tq?tqx=out:csv&sheet=' + encodeURIComponent(sheet.tab);
+  }
+
+  function parseCSV(text){
+    const rows = [];
+    let row = [], field = '', inQuotes = false;
+    for (let i=0; i<text.length; i++){
+      const c = text[i];
+      if (inQuotes){
+        if (c === '"'){
+          if (text[i+1] === '"'){ field += '"'; i++; }
+          else inQuotes = false;
+        } else field += c;
+      } else {
+        if (c === '"') inQuotes = true;
+        else if (c === ','){ row.push(field); field=''; }
+        else if (c === '\n'){ row.push(field); rows.push(row); row=[]; field=''; }
+        else if (c === '\r'){ /* skip */ }
+        else field += c;
+      }
+    }
+    if (field.length || row.length){ row.push(field); rows.push(row); }
+    return rows;
+  }
+
+  function colIndex(headers, name){
+    const target = name.trim().toLowerCase();
+    return headers.findIndex(function(h){ return (h||'').trim().toLowerCase() === target; });
+  }
+
+  function parseMoney(s){
+    if (!s) return 0;
+    s = String(s).trim();
+    if (s === '' || s === '-') return 0;
+    let neg = false;
+    if (s.startsWith('(') && s.endsWith(')')){ neg = true; s = s.slice(1,-1); }
+    s = s.replace(/\$/g,'').replace(/\s/g,'');
+    if (s.startsWith('-')){ neg = true; s = s.slice(1); }
+    s = s.replace(/,/g,'');
+    const v = parseFloat(s);
+    if (isNaN(v)) return 0;
+    return neg ? -v : v;
+  }
+
+  function parseFechaDMY(s){
+    const parts = (s||'').trim().split('/');
+    if (parts.length !== 3) return null;
+    const d = parseInt(parts[0],10), m = parseInt(parts[1],10), y = parseInt(parts[2],10);
+    if (!d || !m || !y) return null;
+    return Date.UTC(y, m-1, d);
+  }
+
+  function splitSkuField(field, knownCommaSkus){
+    let f = field;
+    knownCommaSkus.forEach(function(cs){
+      if (f.indexOf(cs) !== -1) f = f.split(cs).join(cs.replace(',', '\u0000'));
+    });
+    return f.split(',').map(function(p){ return p.trim().replace(/\u0000/g, ','); }).filter(Boolean);
+  }
+
+  async function syncFromSheets(){
+    const bar = document.getElementById('syncBar');
+    const status = document.getElementById('syncStatus');
+    bar.classList.remove('err','ok');
+    status.textContent = 'Sincronizando con Google Sheets…';
+    try {
+      const [factText, stockText] = await Promise.all([
+        fetch(gvizUrl(SHEETS.facturacion)).then(function(r){ if(!r.ok) throw new Error('facturacion '+r.status); return r.text(); }),
+        fetch(gvizUrl(SHEETS.stock)).then(function(r){ if(!r.ok) throw new Error('stock '+r.status); return r.text(); })
+      ]);
+
+      // --- Stock / precio (pestaña "Laura") ---
+      const stockRows = parseCSV(stockText);
+      const stockHeaders = stockRows[1]; // fila 0 es numeración de columnas, fila 1 son los títulos reales
+      const iSku = colIndex(stockHeaders, 'SKU');
+      const iCat = colIndex(stockHeaders, 'Categoría');
+      const iSubcat = colIndex(stockHeaders, 'Subcategoría');
+      const iDesc = colIndex(stockHeaders, 'Descripción');
+      const iStock = colIndex(stockHeaders, 'Stock Total');
+      const iPrecio = colIndex(stockHeaders, 'PRECIOS ECOM');
+      const iPM = colIndex(stockHeaders, 'PM');
+
+      const established = {};
+      for (let r=2; r<stockRows.length; r++){
+        const row = stockRows[r];
+        if (!row || row.length < 2) continue;
+        if ((row[iPM]||'').trim() !== 'Laura') continue;
+        const cat = (row[iCat]||'').trim();
+        if (cat.toLowerCase() === 'nuevo') continue;
+        const sku = (row[iSku]||'').trim();
+        if (!sku || sku.startsWith('PV-')) continue;
+        const stock = parseMoney(row[iStock]);
+        if (stock <= 0) continue;
+        established[sku] = {
+          sku: sku,
+          desc: (row[iDesc]||'').trim().slice(0,70),
+          cat: cat,
+          subcat: (row[iSubcat]||'').trim(),
+          stock: Math.round(stock),
+          price: Math.round(parseMoney(row[iPrecio])),
+          real: 0
+        };
+      }
+      const knownCommaSkus = Object.keys(established).filter(function(s){ return s.indexOf(',') !== -1; });
+
+      // --- Facturación real (pestaña del período actual) ---
+      const factRows = parseCSV(factText);
+      const factHeaders = factRows[0];
+      const jSku = colIndex(factHeaders, "Sku's Vendidos");
+      const jPM = colIndex(factHeaders, 'PM');
+      const jFact = colIndex(factHeaders, 'Facturacion +IVA');
+      const jFecha = colIndex(factHeaders, 'FechaCreaciónVenta');
+
+      let totalReal = 0, minFecha = null, maxFecha = null;
+      for (let r=1; r<factRows.length; r++){
+        const row = factRows[r];
+        if (!row || row.length < 2) continue;
+        if ((row[jPM]||'').trim() !== 'Laura') continue;
+        const fact = parseMoney(row[jFact]);
+        totalReal += fact;
+        const fecha = parseFechaDMY(row[jFecha]);
+        if (fecha !== null){
+          if (minFecha === null || fecha < minFecha) minFecha = fecha;
+          if (maxFecha === null || fecha > maxFecha) maxFecha = fecha;
+        }
+        const skuField = (row[jSku]||'').trim();
+        if (!skuField) continue;
+        const parts = splitSkuField(skuField, knownCommaSkus);
+        if (!parts.length) continue;
+        const share = fact / parts.length;
+        parts.forEach(function(sk){
+          if (established[sk]) established[sk].real += share;
+        });
+      }
+
+      const diasTranscurridos = (minFecha !== null && maxFecha !== null)
+        ? Math.round((maxFecha - minFecha) / 86400000) + 1
+        : 1;
+      const metaDia = Math.round(totalReal / diasTranscurridos);
+      const goal = metaDia * 30;
+
+      const all = Object.values(established).map(function(i){ return Object.assign({}, i, { real: Math.round(i.real) }); });
+      const bien = all.filter(function(i){ return i.real > 0; }).sort(function(a,b){ return b.real - a.real; });
+      const mal = all.filter(function(i){ return i.real <= 0; }).sort(function(a,b){ return (b.stock*b.price) - (a.stock*a.price); });
+
+      const potencialTotal = all.reduce(function(a,i){ return a + i.stock*i.price; }, 0);
+      const potencialBien = bien.reduce(function(a,i){ return a + i.stock*i.price; }, 0);
+      const potencialMal = mal.reduce(function(a,i){ return a + i.stock*i.price; }, 0);
+
+      DATA = Object.assign({}, DATA, {
+        goal: goal, metaDia: metaDia, bien: bien, mal: mal,
+        potencialTotal: potencialTotal, potencialBien: potencialBien, potencialMal: potencialMal
+      });
+
+      try { localStorage.setItem(CACHE_KEY, JSON.stringify({ data: DATA, ts: Date.now() })); } catch(e){}
+
+      bar.classList.add('ok');
+      status.textContent = 'Sincronizado con Google Sheets — ' + new Date().toLocaleString('es-AR') +
+        ' (' + Math.round(totalReal).toLocaleString('es-AR') + ' en ' + diasTranscurridos + ' días, ' + bien.length + ' SKUs vendiendo)';
+      render();
+    } catch (err) {
+      bar.classList.add('err');
+      let cached = null;
+      try { cached = JSON.parse(localStorage.getItem(CACHE_KEY)); } catch(e){}
+      if (cached && cached.data){
+        DATA = cached.data;
+        status.textContent = 'No se pudo conectar con Sheets (¿están compartidas "cualquiera con el link"?). Mostrando última sincronización: ' + new Date(cached.ts).toLocaleString('es-AR');
+        render();
+      } else {
+        status.textContent = 'No se pudo conectar con Sheets y no hay datos guardados. Revisá que las dos planillas estén compartidas como "cualquiera con el link puede ver".';
+      }
+      console.error(err);
+    }
+  }
+
+  document.getElementById('syncBtn').addEventListener('click', syncFromSheets);
+
   render();
+  syncFromSheets();
 })();
 </script>
 
