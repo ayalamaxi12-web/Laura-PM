@@ -516,6 +516,16 @@
     return f.split(',').map(function(p){ return p.trim().replace(/\u0000/g, ','); }).filter(Boolean);
   }
 
+  function findHeaderRow(rows, requiredHeaders, maxScan){
+    maxScan = maxScan || 6;
+    for (let r=0; r<Math.min(maxScan, rows.length); r++){
+      const lower = rows[r].map(function(h){ return (h||'').trim().toLowerCase(); });
+      const found = requiredHeaders.every(function(rh){ return lower.indexOf(rh.toLowerCase()) !== -1; });
+      if (found) return r;
+    }
+    return -1;
+  }
+
   async function syncFromSheets(){
     const bar = document.getElementById('syncBar');
     const status = document.getElementById('syncStatus');
@@ -529,7 +539,11 @@
 
       // --- Stock / precio (pestaña "Laura") ---
       const stockRows = parseCSV(stockText);
-      const stockHeaders = stockRows[1]; // fila 0 es numeración de columnas, fila 1 son los títulos reales
+      const stockHeaderIdx = findHeaderRow(stockRows, ['SKU','PM','Stock Total','PRECIOS ECOM']);
+      if (stockHeaderIdx === -1){
+        throw new Error('No encontré la fila de encabezados en la pestaña "' + SHEETS.stock.tab + '" del Sheet de stock (busqué SKU / PM / Stock Total / PRECIOS ECOM en las primeras filas). Revisá el nombre de pestaña y que esté compartida como "cualquiera con el link puede ver".');
+      }
+      const stockHeaders = stockRows[stockHeaderIdx];
       const iSku = colIndex(stockHeaders, 'SKU');
       const iCat = colIndex(stockHeaders, 'Categoría');
       const iSubcat = colIndex(stockHeaders, 'Subcategoría');
@@ -542,7 +556,7 @@
       }
 
       const established = {};
-      for (let r=2; r<stockRows.length; r++){
+      for (let r=stockHeaderIdx+1; r<stockRows.length; r++){
         const row = stockRows[r];
         if (!row || row.length < 2) continue;
         if ((row[iPM]||'').trim() !== 'Laura') continue;
@@ -566,7 +580,11 @@
 
       // --- Facturación real (pestaña del período actual) ---
       const factRows = parseCSV(factText);
-      const factHeaders = factRows[0];
+      const factHeaderIdx = findHeaderRow(factRows, ["Sku's Vendidos",'PM','Facturacion +IVA']);
+      if (factHeaderIdx === -1){
+        throw new Error('No encontré la fila de encabezados en la pestaña "' + SHEETS.facturacion.tab + '" del Sheet de facturación (busqué Sku\'s Vendidos / PM / Facturacion +IVA). Revisá el nombre de pestaña y que esté compartida como "cualquiera con el link puede ver".');
+      }
+      const factHeaders = factRows[factHeaderIdx];
       const jSku = colIndex(factHeaders, "Sku's Vendidos");
       const jPM = colIndex(factHeaders, 'PM');
       const jFact = colIndex(factHeaders, 'Facturacion +IVA');
@@ -576,7 +594,7 @@
       }
 
       let totalReal = 0, minFecha = null, maxFecha = null;
-      for (let r=1; r<factRows.length; r++){
+      for (let r=factHeaderIdx+1; r<factRows.length; r++){
         const row = factRows[r];
         if (!row || row.length < 2) continue;
         if ((row[jPM]||'').trim() !== 'Laura') continue;
